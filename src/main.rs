@@ -1,3 +1,7 @@
+use rcat::get_args;
+
 fn main() {
-    println!("Hello, world!");
+    let result = get_args();
+
+    println!("{:?}", result);
 }
