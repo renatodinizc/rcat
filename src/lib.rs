@@ -21,9 +21,7 @@ pub fn get_args() -> Input {
         .short('b').long("number-nonblank")
         .action(ArgAction::SetTrue)
     )
-    .arg(
-      Arg::new("input").action(ArgAction::Append).required(true)
-    )
+    .arg(Arg::new("input").action(ArgAction::Append).default_value("-"))
     .get_matches();
 
     Input {
