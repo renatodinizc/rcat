@@ -35,3 +35,27 @@ pub fn get_args() -> Input {
       numbered_nonblank_lines: *matches.get_one::<bool>("numbered_nonblank_lines").unwrap(),
     }
 }
+
+pub fn display(file: &str) {
+  if file == "-" {
+    let stdin = io::stdin();
+    for line in stdin.lines() {
+        match line {
+            Ok(content) => println!("{content}"),
+            Err(error) => eprintln!("{error}"),
+        }
+    }
+  } else {
+      if let Err(error) = File::open(file) {
+          return eprintln!("rcat: {}: {}", file, error);
+      }
+      let content = File::open(file).unwrap();
+      let buffer = BufReader::new(content);
+      for line in buffer.lines() {
+          match line {
+              Ok(sentence) => println!("{sentence}"),
+              Err(error) => eprintln!("{error}"),
+          }
+      }
+  }
+}
