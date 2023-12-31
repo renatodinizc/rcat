@@ -1,10 +1,12 @@
 use clap::{command, Arg, ArgAction };
+use std::io::{self, BufRead, BufReader};
+use std::fs::File;
 
 #[derive(Debug)]
 pub struct Input {
-  files: Vec<String>,
-  numbered_lines: bool,
-  numbered_nonblank_lines: bool,
+  pub files: Vec<String>,
+  pub numbered_lines: bool,
+  pub numbered_nonblank_lines: bool,
 }
 
 pub fn get_args() -> Input {
@@ -21,11 +23,11 @@ pub fn get_args() -> Input {
         .short('b').long("number-nonblank")
         .action(ArgAction::SetTrue)
     )
-    .arg(Arg::new("input").action(ArgAction::Append).default_value("-"))
+    .arg(Arg::new("files").action(ArgAction::Append).default_value("-"))
     .get_matches();
 
     Input {
-      files: matches.get_many::<String>("input")
+      files: matches.get_many::<String>("files")
         .unwrap()
         .map(|v| v.to_string())
         .collect::<Vec<String>>(),
@@ -33,4 +35,3 @@ pub fn get_args() -> Input {
       numbered_nonblank_lines: *matches.get_one::<bool>("numbered_nonblank_lines").unwrap(),
     }
 }
-
