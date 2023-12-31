@@ -39,9 +39,10 @@ pub fn get_args() -> Input {
 pub fn display(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool ) {
   if file == "-" {
     let stdin = io::stdin();
+    let mut counter = 0;
     for line in stdin.lines() {
         match line {
-            Ok(content) => println!("{content}"),
+            Ok(content) => format_line_to_display(content, numbered_lines, numbered_nonblank_lines, &mut counter),
             Err(error) => eprintln!("{error}"),
         }
     }
@@ -64,7 +65,7 @@ pub fn display(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool )
 
 fn format_line_to_display(text: String, numbered_lines: bool, numbered_nonblank_lines: bool, counter: &mut u32) {
     if numbered_nonblank_lines {
-        if text == "" {
+        if text.is_empty() {
             println!("{text}")
         } else {
             *counter += 1;
