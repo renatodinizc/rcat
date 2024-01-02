@@ -36,8 +36,15 @@ pub fn get_args() -> Input {
     }
 }
 
-pub fn display(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool ) {
+pub fn display(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool) {
   if file == "-" {
+    display_from_stdin(numbered_lines, numbered_nonblank_lines);
+  } else {
+    display_from_file(file, numbered_lines, numbered_nonblank_lines);
+  }
+}
+
+fn display_from_stdin(numbered_lines: bool, numbered_nonblank_lines: bool) {
     let stdin = io::stdin();
     let mut counter = 0;
     for line in stdin.lines() {
@@ -46,21 +53,21 @@ pub fn display(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool )
             Err(error) => eprintln!("{error}"),
         }
     }
-  } else {
-      if let Err(error) = File::open(file) {
-          return eprintln!("rcat: {}: {}", file, error);
-      }
-      let content = File::open(file).unwrap();
-      let buffer = BufReader::new(content);
-      let mut counter = 0;
+}
 
-      for line in buffer.lines() {
-          match line {
-              Ok(sentence) => format_line_to_display(sentence, numbered_lines, numbered_nonblank_lines, &mut counter),
-              Err(error) => eprintln!("{error}"),
-          }
-      }
-  }
+fn display_from_file(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool) {
+    if let Err(error) = File::open(file) { return eprintln!("rcat: {}: {}", file, error) }
+
+    let content = File::open(file).unwrap();
+    let buffer = BufReader::new(content);
+    let mut counter = 0;
+
+    for line in buffer.lines() {
+        match line {
+            Ok(sentence) => format_line_to_display(sentence, numbered_lines, numbered_nonblank_lines, &mut counter),
+            Err(error) => eprintln!("{error}"),
+        }
+    }
 }
 
 fn format_line_to_display(text: String, numbered_lines: bool, numbered_nonblank_lines: bool, counter: &mut u32) {
