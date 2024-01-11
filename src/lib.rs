@@ -102,19 +102,17 @@ fn format_line_to_display(text: String, args: &Args, counter: &mut u32) {
         } else {
             println!("{text}$")
         }
-    } else {
-        if args.numbered_nonblank_lines {
-            if text.is_empty() {
-                println!("{text}")
-            } else {
-                *counter += 1;
-                println!("{counter} {text}")
-            }
-        } else if args.numbered_lines {
+    } else if args.numbered_nonblank_lines {
+        if text.is_empty() {
+            println!("{text}")
+        } else {
             *counter += 1;
             println!("{counter} {text}")
-        } else {
-            println!("{text}")
         }
+    } else if args.numbered_lines {
+        *counter += 1;
+        println!("{counter} {text}")
+    } else {
+        println!("{text}")
     }
 }

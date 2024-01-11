@@ -276,7 +276,7 @@ And the cake is a lie",
 }
 
 #[test]
-fn display_poem_file_with_nE_option() {
+fn display_poem_file_with_nE_options() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
     cmd.arg("tests/inputs/poem.txt");
