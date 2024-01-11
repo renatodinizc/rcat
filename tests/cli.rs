@@ -21,7 +21,9 @@ fn display_non_readable_file() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
     cmd.arg("./tests/inputs/non_readable.txt");
-    cmd.assert().success().stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
+    cmd.assert()
+        .success()
+        .stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
 }
 
 #[test]
@@ -29,7 +31,8 @@ fn display_poem_file() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
     cmd.arg("./tests/inputs/poem.txt");
-    cmd.assert().success().stdout("The Road Not Taken by Robert Frost
+    cmd.assert().success().stdout(
+        "The Road Not Taken by Robert Frost
 
 Two roads diverged in a yellow wood,
 And sorry I could not travel both
@@ -54,7 +57,8 @@ Somewhere ages and ages hence:
 Two roads diverged in a wood, and I—
 I took the one less traveled by,
 And that has made all the difference.
-");
+",
+    );
 }
 
 #[test]
@@ -66,8 +70,11 @@ fn display_all_files() {
     cmd.arg("./tests/inputs/non_readable.txt");
     cmd.arg("./tests/inputs/poem.txt");
 
-    cmd.assert().success().stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
-    cmd.assert().success().stdout("We cannot be more sensitive to pleasure without being more sensitive to pain - Alan Watts
+    cmd.assert()
+        .success()
+        .stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
+    cmd.assert().success().stdout(
+        "We cannot be more sensitive to pleasure without being more sensitive to pain - Alan Watts
 The Road Not Taken by Robert Frost
 
 Two roads diverged in a yellow wood,
@@ -93,7 +100,8 @@ Somewhere ages and ages hence:
 Two roads diverged in a wood, and I—
 I took the one less traveled by,
 And that has made all the difference.
-");
+",
+    );
 }
 
 #[test]
@@ -102,7 +110,9 @@ fn display_from_stdin() {
 
     cmd.write_stdin("Pancakes and apple pie are delicious");
 
-    cmd.assert().success().stdout("Pancakes and apple pie are delicious\n");
+    cmd.assert()
+        .success()
+        .stdout("Pancakes and apple pie are delicious\n");
 }
 
 #[test]
@@ -133,7 +143,9 @@ fn display_file_takes_priority_over_stdin3() {
     cmd.arg("./tests/inputs/non_readable.txt");
 
     cmd.assert().success().stdout("");
-    cmd.assert().success().stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
+    cmd.assert()
+        .success()
+        .stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
 }
 
 #[test]
@@ -142,7 +154,8 @@ fn display_poem_file_with_n_option() {
 
     cmd.arg("./tests/inputs/poem.txt");
     cmd.arg("-n");
-    cmd.assert().success().stdout("1 The Road Not Taken by Robert Frost
+    cmd.assert().success().stdout(
+        "1 The Road Not Taken by Robert Frost
 2 
 3 Two roads diverged in a yellow wood,
 4 And sorry I could not travel both
@@ -167,7 +180,8 @@ fn display_poem_file_with_n_option() {
 23 Two roads diverged in a wood, and I—
 24 I took the one less traveled by,
 25 And that has made all the difference.
-");
+",
+    );
 }
 
 #[test]
@@ -176,7 +190,8 @@ fn display_poem_file_with_b_option() {
 
     cmd.arg("./tests/inputs/poem.txt");
     cmd.arg("-b");
-    cmd.assert().success().stdout("1 The Road Not Taken by Robert Frost
+    cmd.assert().success().stdout(
+        "1 The Road Not Taken by Robert Frost
 
 2 Two roads diverged in a yellow wood,
 3 And sorry I could not travel both
@@ -201,7 +216,8 @@ fn display_poem_file_with_b_option() {
 19 Two roads diverged in a wood, and I—
 20 I took the one less traveled by,
 21 And that has made all the difference.
-");
+",
+    );
 }
 
 #[test]
@@ -210,7 +226,8 @@ fn display_poem_file_with_nb_options() {
 
     cmd.arg("./tests/inputs/poem.txt");
     cmd.arg("-nb");
-    cmd.assert().success().stdout("1 The Road Not Taken by Robert Frost
+    cmd.assert().success().stdout(
+        "1 The Road Not Taken by Robert Frost
 
 2 Two roads diverged in a yellow wood,
 3 And sorry I could not travel both
@@ -235,20 +252,25 @@ fn display_poem_file_with_nb_options() {
 19 Two roads diverged in a wood, and I—
 20 I took the one less traveled by,
 21 And that has made all the difference.
-");
+",
+    );
 }
 
 #[test]
 fn display_from_stdin_with_nb_options() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.write_stdin("Pancakes and apple pie are delicious
+    cmd.write_stdin(
+        "Pancakes and apple pie are delicious
 
-And the cake is a lie");
+And the cake is a lie",
+    );
     cmd.arg("-nb");
 
-    cmd.assert().success().stdout("1 Pancakes and apple pie are delicious
+    cmd.assert().success().stdout(
+        "1 Pancakes and apple pie are delicious
 
 2 And the cake is a lie
-");
+",
+    );
 }
