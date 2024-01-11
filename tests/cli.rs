@@ -257,6 +257,101 @@ fn display_poem_file_with_nb_options() {
 }
 
 #[test]
+fn display_tao_file_with_ns_options() {
+    let mut cmd = Command::cargo_bin("rcat").unwrap();
+
+    cmd.arg("tests/inputs/tao.txt");
+    cmd.arg("-ns");
+    cmd.assert().success().stdout(
+        "1 Heaven and Earth endure,
+2 
+3 By not endowing themselves with life.
+4 
+5 Then they can be long-lived.
+6 
+7 So the wise place Self last,
+8 
+9 And it comes first,
+10 
+11 Call it other than themselves,
+12 
+13 And it persists.
+14 
+15 By not thinking of Self
+16 
+17 The personal goal is achieved.
+18 
+",
+    );
+}
+
+#[test]
+fn display_tao_file_with_nE_options() {
+    let mut cmd = Command::cargo_bin("rcat").unwrap();
+
+    cmd.arg("tests/inputs/tao.txt");
+    cmd.arg("-nE");
+    cmd.assert().success().stdout(
+        "1 Heaven and Earth endure,$
+2 $
+3 By not endowing themselves with life.$
+4 $
+5 $
+6 Then they can be long-lived.$
+7 $
+8 So the wise place Self last,$
+9 $
+10 $
+11 $
+12 And it comes first,$
+13 $
+14 Call it other than themselves,$
+15 $
+16 $
+17 $
+18 $
+19 $
+20 And it persists.$
+21 $
+22 By not thinking of Self$
+23 $
+24 The personal goal is achieved.$
+25 $
+26 $
+",
+    );
+}
+
+#[test]
+fn display_tao_file_with_ns_show_ends_options() {
+    let mut cmd = Command::cargo_bin("rcat").unwrap();
+
+    cmd.arg("tests/inputs/tao.txt");
+    cmd.arg("-nsE");
+    cmd.assert().success().stdout(
+        "1 Heaven and Earth endure,$
+2 $
+3 By not endowing themselves with life.$
+4 $
+5 Then they can be long-lived.$
+6 $
+7 So the wise place Self last,$
+8 $
+9 And it comes first,$
+10 $
+11 Call it other than themselves,$
+12 $
+13 And it persists.$
+14 $
+15 By not thinking of Self$
+16 $
+17 The personal goal is achieved.$
+18 $
+",
+    );
+}
+
+#[test]
 fn display_from_stdin_with_nb_options() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
