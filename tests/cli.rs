@@ -4,7 +4,7 @@ use assert_cmd::Command;
 fn display_empty_file() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/empty.txt");
+    cmd.arg("tests/inputs/empty.txt");
     cmd.assert().success().stdout("");
 }
 
@@ -12,7 +12,7 @@ fn display_empty_file() {
 fn display_phrase_file() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/phrase.txt");
+    cmd.arg("tests/inputs/phrase.txt");
     cmd.assert().success().stdout("We cannot be more sensitive to pleasure without being more sensitive to pain - Alan Watts\n");
 }
 
@@ -20,17 +20,17 @@ fn display_phrase_file() {
 fn display_non_readable_file() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/non_readable.txt");
+    cmd.arg("tests/inputs/non_readable.txt");
     cmd.assert()
         .success()
-        .stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
+        .stderr("rcat: tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
 }
 
 #[test]
 fn display_poem_file() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/poem.txt");
+    cmd.arg("tests/inputs/poem.txt");
     cmd.assert().success().stdout(
         "The Road Not Taken by Robert Frost
 
@@ -65,14 +65,14 @@ And that has made all the difference.
 fn display_all_files() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/phrase.txt");
-    cmd.arg("./tests/inputs/empty.txt");
-    cmd.arg("./tests/inputs/non_readable.txt");
-    cmd.arg("./tests/inputs/poem.txt");
+    cmd.arg("tests/inputs/phrase.txt");
+    cmd.arg("tests/inputs/empty.txt");
+    cmd.arg("tests/inputs/non_readable.txt");
+    cmd.arg("tests/inputs/poem.txt");
 
     cmd.assert()
         .success()
-        .stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
+        .stderr("rcat: tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
     cmd.assert().success().stdout(
         "We cannot be more sensitive to pleasure without being more sensitive to pain - Alan Watts
 The Road Not Taken by Robert Frost
@@ -120,7 +120,7 @@ fn display_file_takes_priority_over_stdin() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
     cmd.write_stdin("Pancakes and apple pie are delicious");
-    cmd.arg("./tests/inputs/phrase.txt");
+    cmd.arg("tests/inputs/phrase.txt");
 
     cmd.assert().success().stdout("We cannot be more sensitive to pleasure without being more sensitive to pain - Alan Watts\n");
 }
@@ -130,7 +130,7 @@ fn display_file_takes_priority_over_stdin2() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
     cmd.write_stdin("Pancakes and apple pie are delicious");
-    cmd.arg("./tests/inputs/empty.txt");
+    cmd.arg("tests/inputs/empty.txt");
 
     cmd.assert().success().stdout("");
 }
@@ -140,19 +140,19 @@ fn display_file_takes_priority_over_stdin3() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
     cmd.write_stdin("Pancakes and apple pie are delicious");
-    cmd.arg("./tests/inputs/non_readable.txt");
+    cmd.arg("tests/inputs/non_readable.txt");
 
     cmd.assert().success().stdout("");
     cmd.assert()
         .success()
-        .stderr("rcat: ./tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
+        .stderr("rcat: tests/inputs/non_readable.txt: Permission denied (os error 13)\n");
 }
 
 #[test]
 fn display_poem_file_with_n_option() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/poem.txt");
+    cmd.arg("tests/inputs/poem.txt");
     cmd.arg("-n");
     cmd.assert().success().stdout(
         "1 The Road Not Taken by Robert Frost
@@ -188,7 +188,7 @@ fn display_poem_file_with_n_option() {
 fn display_poem_file_with_b_option() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/poem.txt");
+    cmd.arg("tests/inputs/poem.txt");
     cmd.arg("-b");
     cmd.assert().success().stdout(
         "1 The Road Not Taken by Robert Frost
@@ -224,7 +224,7 @@ fn display_poem_file_with_b_option() {
 fn display_poem_file_with_nb_options() {
     let mut cmd = Command::cargo_bin("rcat").unwrap();
 
-    cmd.arg("./tests/inputs/poem.txt");
+    cmd.arg("tests/inputs/poem.txt");
     cmd.arg("-nb");
     cmd.assert().success().stdout(
         "1 The Road Not Taken by Robert Frost
@@ -271,6 +271,42 @@ And the cake is a lie",
         "1 Pancakes and apple pie are delicious
 
 2 And the cake is a lie
+",
+    );
+}
+
+#[test]
+fn display_poem_file_with_nE_option() {
+    let mut cmd = Command::cargo_bin("rcat").unwrap();
+
+    cmd.arg("tests/inputs/poem.txt");
+    cmd.arg("-nE");
+    cmd.assert().success().stdout(
+        "1 The Road Not Taken by Robert Frost$
+2 $
+3 Two roads diverged in a yellow wood,$
+4 And sorry I could not travel both$
+5 And be one traveler, long I stood$
+6 And looked down one as far as I could$
+7 To where it bent in the undergrowth;$
+8 $
+9 Then took the other, as just as fair,$
+10 And having perhaps the better claim,$
+11 Because it was grassy and wanted wear;$
+12 Though as for that the passing there$
+13 Had worn them really about the same,$
+14 $
+15 And both that morning equally lay$
+16 In leaves no step had trodden black.$
+17 Oh, I kept the first for another day!$
+18 Yet knowing how way leads on to way,$
+19 I doubted if I should ever come back.$
+20 $
+21 I shall be telling this with a sigh$
+22 Somewhere ages and ages hence:$
+23 Two roads diverged in a wood, and I—$
+24 I took the one less traveled by,$
+25 And that has made all the difference.$
 ",
     );
 }

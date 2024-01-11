@@ -2,14 +2,14 @@ use clap::{command, Arg, ArgAction};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
-#[derive(Debug)]
-pub struct Input {
+pub struct Args {
     pub files: Vec<String>,
-    pub numbered_lines: bool,
-    pub numbered_nonblank_lines: bool,
+    numbered_lines: bool,
+    numbered_nonblank_lines: bool,
+    show_ends: bool,
 }
 
-pub fn get_args() -> Input {
+pub fn get_args() -> Args {
     let matches = command!()
         .arg(
             Arg::new("numbered_lines")
@@ -26,13 +26,20 @@ pub fn get_args() -> Input {
                 .action(ArgAction::SetTrue),
         )
         .arg(
+            Arg::new("show_ends")
+                .help("display $ at end of each line")
+                .short('E')
+                .long("show-ends")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("files")
                 .action(ArgAction::Append)
                 .default_value("-"),
         )
         .get_matches();
 
-    Input {
+    Args {
         files: matches
             .get_many::<String>("files")
             .unwrap()
@@ -40,34 +47,30 @@ pub fn get_args() -> Input {
             .collect::<Vec<String>>(),
         numbered_lines: *matches.get_one::<bool>("numbered_lines").unwrap(),
         numbered_nonblank_lines: *matches.get_one::<bool>("numbered_nonblank_lines").unwrap(),
+        show_ends: *matches.get_one::<bool>("show_ends").unwrap(),
     }
 }
 
-pub fn display(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool) {
+pub fn display(file: &str, args: &Args) {
     if file == "-" {
-        display_from_stdin(numbered_lines, numbered_nonblank_lines);
+        display_from_stdin(args);
     } else {
-        display_from_file(file, numbered_lines, numbered_nonblank_lines);
+        display_from_file(file, args);
     }
 }
 
-fn display_from_stdin(numbered_lines: bool, numbered_nonblank_lines: bool) {
+fn display_from_stdin(args: &Args) {
     let stdin = io::stdin();
     let mut counter = 0;
     for line in stdin.lines() {
         match line {
-            Ok(content) => format_line_to_display(
-                content,
-                numbered_lines,
-                numbered_nonblank_lines,
-                &mut counter,
-            ),
+            Ok(content) => format_line_to_display(content, args, &mut counter),
             Err(error) => eprintln!("{error}"),
         }
     }
 }
 
-fn display_from_file(file: &str, numbered_lines: bool, numbered_nonblank_lines: bool) {
+fn display_from_file(file: &str, args: &Args) {
     if let Err(error) = File::open(file) {
         return eprintln!("rcat: {}: {}", file, error);
     }
@@ -78,34 +81,40 @@ fn display_from_file(file: &str, numbered_lines: bool, numbered_nonblank_lines: 
 
     for line in buffer.lines() {
         match line {
-            Ok(sentence) => format_line_to_display(
-                sentence,
-                numbered_lines,
-                numbered_nonblank_lines,
-                &mut counter,
-            ),
+            Ok(sentence) => format_line_to_display(sentence, args, &mut counter),
             Err(error) => eprintln!("{error}"),
         }
     }
 }
 
-fn format_line_to_display(
-    text: String,
-    numbered_lines: bool,
-    numbered_nonblank_lines: bool,
-    counter: &mut u32,
-) {
-    if numbered_nonblank_lines {
-        if text.is_empty() {
-            println!("{text}")
+fn format_line_to_display(text: String, args: &Args, counter: &mut u32) {
+    if args.show_ends {
+        if args.numbered_nonblank_lines {
+            if text.is_empty() {
+                println!("{text}$")
+            } else {
+                *counter += 1;
+                println!("{counter} {text}$")
+            }
+        } else if args.numbered_lines {
+            *counter += 1;
+            println!("{counter} {text}$")
         } else {
+            println!("{text}$")
+        }
+    } else {
+        if args.numbered_nonblank_lines {
+            if text.is_empty() {
+                println!("{text}")
+            } else {
+                *counter += 1;
+                println!("{counter} {text}")
+            }
+        } else if args.numbered_lines {
             *counter += 1;
             println!("{counter} {text}")
+        } else {
+            println!("{text}")
         }
-    } else if numbered_lines {
-        *counter += 1;
-        println!("{counter} {text}")
-    } else {
-        println!("{text}")
     }
 }
