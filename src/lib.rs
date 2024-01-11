@@ -7,6 +7,7 @@ pub struct Args {
     numbered_lines: bool,
     numbered_nonblank_lines: bool,
     show_ends: bool,
+    squeeze_blank: bool,
 }
 
 pub fn get_args() -> Args {
@@ -33,6 +34,13 @@ pub fn get_args() -> Args {
                 .action(ArgAction::SetTrue),
         )
         .arg(
+            Arg::new("squeeze_blank")
+                .help("suppress repeated empty output lines")
+                .short('s')
+                .long("squeeze-blank")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("files")
                 .action(ArgAction::Append)
                 .default_value("-"),
@@ -48,6 +56,7 @@ pub fn get_args() -> Args {
         numbered_lines: *matches.get_one::<bool>("numbered_lines").unwrap(),
         numbered_nonblank_lines: *matches.get_one::<bool>("numbered_nonblank_lines").unwrap(),
         show_ends: *matches.get_one::<bool>("show_ends").unwrap(),
+        squeeze_blank: *matches.get_one::<bool>("squeeze_blank").unwrap(),
     }
 }
 
@@ -64,7 +73,7 @@ fn display_from_stdin(args: &Args) {
     let mut counter = 0;
     for line in stdin.lines() {
         match line {
-            Ok(content) => format_line_to_display(content, args, &mut counter),
+            Ok(content) => format_line_to_display(&content, args, &mut counter),
             Err(error) => eprintln!("{error}"),
         }
     }
@@ -79,15 +88,23 @@ fn display_from_file(file: &str, args: &Args) {
     let buffer = BufReader::new(content);
     let mut counter = 0;
 
+    let mut current_line = String::new();
+
     for line in buffer.lines() {
         match line {
-            Ok(sentence) => format_line_to_display(sentence, args, &mut counter),
+            Ok(sentence) => {
+                if args.squeeze_blank && sentence.is_empty() && sentence == current_line {
+                    continue;
+                };
+                current_line = sentence.clone();
+                format_line_to_display(&sentence, args, &mut counter);
+            }
             Err(error) => eprintln!("{error}"),
         }
     }
 }
 
-fn format_line_to_display(text: String, args: &Args, counter: &mut u32) {
+fn format_line_to_display(text: &str, args: &Args, counter: &mut u32) {
     if args.show_ends {
         if args.numbered_nonblank_lines {
             if text.is_empty() {
