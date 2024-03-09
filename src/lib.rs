@@ -2,15 +2,21 @@ use clap::{command, Arg, ArgAction};
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
-pub struct Args {
-    pub files: Vec<String>,
+struct Args {
+    files: Vec<String>,
     numbered_lines: bool,
     numbered_nonblank_lines: bool,
     show_ends: bool,
     squeeze_blank: bool,
 }
 
-pub fn get_args() -> Args {
+pub fn execute() {
+    let args = get_args();
+
+    display_files(args);
+}
+
+fn get_args() -> Args {
     let matches = command!()
         .arg(
             Arg::new("numbered_lines")
@@ -60,23 +66,30 @@ pub fn get_args() -> Args {
     }
 }
 
-pub fn display(file: &str, args: &Args) {
-    if file == "-" {
-        display_from_stdin(args);
-    } else {
-        display_from_file(file, args);
-    }
+fn display_files(args: Args) {
+    args.files.iter().for_each(|file| {
+        if file == "-" {
+            display_from_stdin(&args)
+        } else {
+            display_from_file(file, &args)
+        }
+    })
 }
 
 fn display_from_stdin(args: &Args) {
     let stdin = io::stdin();
     let mut counter = 0;
-    for line in stdin.lines() {
-        match line {
-            Ok(content) => format_line_to_display(&content, args, &mut counter),
-            Err(error) => eprintln!("{error}"),
-        }
-    }
+
+    stdin
+        .lines()
+        .filter_map(|line| match line {
+            Err(error) => {
+                eprintln!("{error}");
+                None
+            }
+            Ok(line) => Some(line),
+        })
+        .for_each(|line| format_line_to_display(&line, args, &mut counter));
 }
 
 fn display_from_file(file: &str, args: &Args) {
